@@ -1,0 +1,68 @@
+require 'spec_helper'
+
+describe "AuthenticationPages" do
+
+	subject { page }
+
+	describe "signin page" do 
+		before { visit signin_path }
+
+		it { should have_selector('h1', text: 'Sign in') }
+		it { should have_selector('title', text: 'Sign in') }
+	end
+
+	describe "sign in" do
+
+		before { visit signin_path }
+
+		describe "invalid user" do
+			before { click_button "Sign in" }
+
+			it { should have_selector('title', text: 'Sign in') }
+			it { should have_selector('div.alert.alert-error', text: 'Invalid') }
+
+			it { should_not have_link('Profile') }
+			it { should_not have_link('Settings') }
+
+			describe "not have alert after visit another page" do
+				before { click_link "Home" }
+				it { should_not have_selector('div.alert.alert-error') }
+			end
+		end
+
+		describe "valid user" do
+			let(:user) { FactoryGirl.create(:user) }
+			before { sign_in user }
+
+			it { should have_selector('title', text: user.name) }
+			it { should have_link('Profile', href: user_path(user)) }
+			it { should have_link('Settings', href: edit_user_path(user)) }
+			it { should have_link('Sign out', href: signout_path) }
+			it { should_not have_link('Sign in', href: signin_path) }
+
+			describe "after sign out" do
+				before { click_link 'Sign out' }
+				it { should have_link('Sign in') }
+			end
+		end
+	end
+
+	describe "authorization" do
+
+		describe "non-signed-in user" do
+			let(:user) { FactoryGirl.create(:user) }
+
+			describe "show profile user" do
+				before { get user_path(user) }
+				specify { response.should redirect_to(signin_path) }
+			end
+
+			describe "show all users" do
+				before { get users_path }
+				specify { response.should redirect_to(signin_path) }
+			end
+
+
+		end
+	end
+end

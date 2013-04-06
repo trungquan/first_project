@@ -1,0 +1,13 @@
+<% provide(:title, "First Application") %>
+<div class="center hero-unit">
+	<h1>Welcome to Project Manager</h1>
+
+	<h4>
+		This is the first project by QuanNT
+	</h4>
+
+	<% if !signed_in? %>
+		<%= link_to "Sign up now!", signup_path , class: "btn btn-large btn-primary" %>
+	<% else %>
+	<% end %>
+</div>
